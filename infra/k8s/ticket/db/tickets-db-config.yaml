@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticket-db-config
+  namespace: tickets-app
+data:
+  POSTGRES_DB: auths
+  POSTGRES_USERNAME: root

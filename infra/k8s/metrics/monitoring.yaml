@@ -1,0 +1,22 @@
+prometheus:
+  global:
+    scrape_interval: 15s
+  metadata:
+    name: monitoring
+  service:
+    type: NodePort
+  server:
+    enabled: true
+    additionalScrapeConfigs:
+    - job_name: 'auth-srv-metrics'
+      honor_labels: false
+      static_configs:
+      - targets: [ 'tickets.dev' ]
+      metrics_path: /api/users/metrics
+      scheme: https
+      tls_config:
+        insecure_skip_verify: true
+
+grafana:
+  service:
+    type: NodePort

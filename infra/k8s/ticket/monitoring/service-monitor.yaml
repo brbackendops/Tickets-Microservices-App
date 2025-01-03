@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tickets-service-monitor
+  namespace: default
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: tickets-srv
+  endpoints:
+  - path: /api/tickets/metrics
+    port: tickets
+    interval: 15s

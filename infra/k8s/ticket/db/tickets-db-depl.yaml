@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-db-depl
+  namespace: tickets-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tickets-db
+  template:
+    metadata:
+      labels:
+        app: tickets-db
+    spec:
+      containers:
+      - name: tickets-db
+        image: postgres
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: ticket-db-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ticket-db-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: ticket-db-secret
+              key: POSTGRES_DB
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgresdata
+      volumes:
+      - name: postgresdata
+        persistentVolumeClaim:
+          claimName: postgres-volume-data-tickets
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-db-srv
+spec:
+  selector:
+    app: tickets-db
+  ports:
+  - port: 5432
+    targetPort: 5432

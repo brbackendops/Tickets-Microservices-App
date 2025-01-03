@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1734954913928,
+      "tag": "0000_sad_wildside",
+      "breakpoints": true
+    }
+  ]
+}

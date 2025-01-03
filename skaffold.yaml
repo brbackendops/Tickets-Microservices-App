@@ -1,0 +1,47 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: buildpacks-ticket
+deploy:
+  kubectl:
+    manifests:
+    # Auth service  and its dependencies
+    - ./infra/k8s/auth/auth-namespace.yaml
+    - ./infra/k8s/auth/auth-secret.yaml
+    - ./infra/k8s/auth/auth-depl.yaml
+    - ./infra/k8s/auth/db/*.yaml
+    - ./infra/k8s/auth/monitoring/*.yaml
+
+    # Tickets service and its dependencies
+    - ./infra/k8s/ticket/tickets-namespace.yaml
+    - ./infra/k8s/ticket/tickets-secret.yaml
+    - ./infra/k8s/ticket/tickets-depl.yaml
+    - ./infra/k8s/ticket/db/*.yaml
+    - ./infra/k8s/ticket/monitoring/*.yaml
+
+    # Shared infrastructure
+    - ./infra/k8s/ingress/*.yaml
+    #- ./infra/k8s/metrics/*.yaml
+    - ./infra/k8s/nats/*.yaml
+    - ./infra/k8s/tracing/*.yaml
+
+build:
+  local:
+    push: false
+  artifacts:
+  - image: rohitbrk12345/auth
+    context: auth
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - dest: .
+        src: 'src/**/*.ts'
+  - image: rohitbrk12345/tickets
+    context: tickets
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - dest: .
+        src: 'src/**/*.ts'
