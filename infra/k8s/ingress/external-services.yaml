@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv-external
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: auth-srv.auths.svc.cluster.local
+...
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-srv-external
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: tickets-srv.tickets-app.svc.cluster.local
+...
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-srv-external
+spec:
+  type: ExternalName
+  externalName: orders-srv.orders-app.svc.cluster.local

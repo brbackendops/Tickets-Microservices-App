@@ -48,7 +48,7 @@ daemonset:
 
       output.elasticsearch:
         host: '${NODE_NAME}'
-        hosts: '["https://${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}"]'
+        hosts: '["http://${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}"]'
         username: '${ELASTICSEARCH_USERNAME}'
         password: '${ELASTICSEARCH_PASSWORD}'
         protocol: https
@@ -74,11 +74,11 @@ daemonset:
     privileged: false
   resources:
     requests:
-      cpu: "100m"
-      memory: "100Mi"
+      cpu: "250m"
+      memory: "500Mi"
     limits:
-      cpu: "1000m"
-      memory: "200Mi"
+      cpu: "800m"
+      memory: "900Mi"
   tolerations: []
 
 deployment:
@@ -173,11 +173,11 @@ deployment:
     privileged: false
   resources:
     requests:
-      cpu: "100m"
-      memory: "100Mi"
+      cpu: "250m"
+      memory: "500Mi"
     limits:
-      cpu: "1000m"
-      memory: "200Mi"
+      cpu: "800m"
+      memory: "900Mi"
   tolerations: []
 
 # Replicas being used for the filebeat deployment

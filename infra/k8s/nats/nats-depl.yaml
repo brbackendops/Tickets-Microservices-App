@@ -15,13 +15,13 @@ spec:
       - name: nats
         image: nats-streaming:0.17.0
         args: [ '-p', '4222', '-m', '8222', '-hbi', '5s', '-hbt', '5s', '-hbf', '2', '-SD', '-cid', 'ticketing' ]
-resources:
-  requests:
-    memory: "64Mi"
-    cpu: "100m"
-  limits:
-    memory: "128Mi"
-    cpu: "200m"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "200Mi"
+            cpu: "400m"
 ---
 
 apiVersion: v1

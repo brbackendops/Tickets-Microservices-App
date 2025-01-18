@@ -1,30 +1,30 @@
-apiVersion: skaffold/v2beta29
+apiVersion: skaffold/v4beta11
 kind: Config
 metadata:
   name: buildpacks-ticket
-deploy:
-  kubectl:
-    manifests:
-    # Auth service  and its dependencies
-    - ./infra/k8s/auth/auth-namespace.yaml
-    - ./infra/k8s/auth/auth-secret.yaml
-    - ./infra/k8s/auth/auth-depl.yaml
-    - ./infra/k8s/auth/db/*.yaml
-    - ./infra/k8s/auth/monitoring/*.yaml
-
-    # Tickets service and its dependencies
-    - ./infra/k8s/ticket/tickets-namespace.yaml
-    - ./infra/k8s/ticket/tickets-secret.yaml
-    - ./infra/k8s/ticket/tickets-depl.yaml
-    - ./infra/k8s/ticket/db/*.yaml
-    - ./infra/k8s/ticket/monitoring/*.yaml
-
-    # Shared infrastructure
-    - ./infra/k8s/ingress/*.yaml
-    #- ./infra/k8s/metrics/*.yaml
-    - ./infra/k8s/nats/*.yaml
-    - ./infra/k8s/tracing/*.yaml
-
+manifests:
+  rawYaml:
+  # Namespaces first
+  - ./infra/k8s/auth/auth-namespace.yaml
+  - ./infra/k8s/ticket/tickets-namespace.yaml
+  - ./infra/k8s/orders/orders-namespace.yaml
+  # Core services
+  - ./infra/k8s/auth/*.yaml
+  - ./infra/k8s/ticket/*.yaml
+  - ./infra/k8s/orders/*.yaml
+  # Databases
+  - ./infra/k8s/auth/db/*.yaml
+  - ./infra/k8s/ticket/db/*.yaml
+  - ./infra/k8s/orders/db/*.yaml
+  # Infrastructure
+  - ./infra/k8s/ingress/*.yaml
+  - ./infra/k8s/nats/*.yaml
+  # - ./infra/k8s/metrics/*.yaml
+  - ./infra/k8s/tracing/*.yaml
+  # Monitoring
+  - ./infra/k8s/auth/monitoring/*.yaml
+  - ./infra/k8s/ticket/monitoring/*.yaml
+  - ./infra/k8s/orders/monitoring/*.yaml
 build:
   local:
     push: false
@@ -39,6 +39,14 @@ build:
         src: 'src/**/*.ts'
   - image: rohitbrk12345/tickets
     context: tickets
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - dest: .
+        src: 'src/**/*.ts'
+  - image: rohitbrk12345/orders
+    context: orders
     docker:
       dockerfile: Dockerfile
     sync:

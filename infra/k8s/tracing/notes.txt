@@ -1,4 +1,0 @@
-for production:
-
-service:
-    type: LoadBalancer

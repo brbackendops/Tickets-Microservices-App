@@ -27,7 +27,8 @@ const zipkinExporter = new ZipkinExporter({
             'Service-Name': serviceName
         },
         statusCodeTagName: 'http.status_code',
-    })
+})
+
 
 const sdk = new NodeSDK({
     resource: new Resource({
@@ -35,7 +36,11 @@ const sdk = new NodeSDK({
         [ATTR_SERVICE_VERSION]: serviceVersion
     }),
     // traceExporter: zipkinExporter,
-    spanProcessor:new BatchSpanProcessor(zipkinExporter),
+    spanProcessor: new BatchSpanProcessor(zipkinExporter,{
+        scheduledDelayMillis: 100,
+        maxQueueSize:1,
+        maxExportBatchSize: 1
+    }),
     instrumentations: [
         getNodeAutoInstrumentations(),
         new HttpInstrumentation(),
@@ -48,4 +53,7 @@ sdk.start()
 logger.info(`OpenTelemetry SDK started, sending traces to Zipkin from ${serviceName}`);
 console.log(`OpenTelemetry SDK started, sending traces to Zipkin from ${serviceName}`);
 
-process.on('SIGTERM', () => sdk.shutdown());
+process.on('SIGTERM', () => {
+    sdk.shutdown()
+    zipkinExporter.shutdown()
+});

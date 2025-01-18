@@ -17,13 +17,20 @@ spec:
         path: /api/users/?(.*)
         backend:
           service:
-            name: auth-srv.auths.svc.cluster.local
+            name: auth-srv-external
             port:
               number: 3000
       - pathType: ImplementationSpecific
         path: /api/tickets/?(.*)
         backend:
           service:
-            name: tickets-srv.tickets-app.svc.cluster.local
+            name: tickets-srv-external
             port:
               number: 4000
+      - pathType: ImplementationSpecific
+        path: /api/orders/?(.*)
+        backend:
+          service:
+            name: orders-srv-external
+            port:
+              number: 5000
