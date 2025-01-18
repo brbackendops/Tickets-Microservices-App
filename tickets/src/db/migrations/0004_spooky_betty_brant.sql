@@ -1,0 +1,1 @@
+ALTER TABLE "tickets" ADD COLUMN "lock" boolean DEFAULT false NOT NULL;

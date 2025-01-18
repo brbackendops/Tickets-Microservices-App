@@ -1,0 +1,7 @@
+node_modules
+misc
+misc/*
+misc/*.json
+misc/*.log
+dist
+*.env
