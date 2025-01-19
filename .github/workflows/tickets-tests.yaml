@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cd payments && npm install && npm run test:ci
+      - run: cd tickets && npm install && npm run test:ci
 
   format:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
-        - run: cd payments && npm run format:check
+        - run: cd tickets && npm run format:check
     continue-on-error: true
 
   scan:
@@ -26,9 +26,9 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Build Docker Image
-        working-directory: ./payments
+        working-directory: ./tickets
         run: |
-          docker build -t rohitbrk12345/payments:${{ github.sha }} .
+          docker build -t rohitbrk12345/tickets:${{ github.sha }} .
       
       - name: install trivy
         run: |
@@ -42,7 +42,7 @@ jobs:
             --no-progress \
             --format sarif \
             --output trivy-results.sarif \
-            rohitbrk12345/payments:${{ github.sha }}
+            rohitbrk12345/tickets:${{ github.sha }}
         continue-on-error: true
 
       - name: Upload Trivy Scan Results to Github Security Tab

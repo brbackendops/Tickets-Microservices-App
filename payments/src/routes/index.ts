@@ -1,12 +1,8 @@
-import express from 'express'
-import { createCharge , getAllPayments } from '../controllers';
+import express from 'express';
+import { createCharge, getAllPayments } from '../controllers';
 
-const router = express.Router()
+const router = express.Router();
 
-
-
-router.route('/')
-    .post(createCharge)
-    .get(getAllPayments);
+router.route('/').post(createCharge).get(getAllPayments);
 
 export default router;

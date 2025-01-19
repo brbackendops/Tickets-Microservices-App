@@ -1,15 +1,14 @@
-import { createLogger , transports } from 'winston';
+import { createLogger, transports } from 'winston';
 import ecsFormat from '@elastic/ecs-winston-format';
 import 'winston-daily-rotate-file';
 import path from 'path';
 import fs from 'fs';
 
-
 const TODAY = new Date().toISOString().split('T')[0];
 const logDirectory = path.resolve(__dirname, '../misc/logs/');
 
 if (!fs.existsSync(logDirectory)) {
-    fs.mkdirSync(logDirectory,{ recursive: true })
+  fs.mkdirSync(logDirectory, { recursive: true });
 }
 
 /*
@@ -24,21 +23,19 @@ format.combine(
 */
 
 const logger = createLogger({
-    level: 'info',
-    exitOnError: false,
-    format: ecsFormat({ convertReqRes: true }),
-    transports: [
-        new transports.Console(),
-        // new transports.File({ filename: logDirectory + `/${Date.now()}-app.log` , maxsize: 20 }),
-        new transports.DailyRotateFile({
-            filename: path.join(logDirectory,'app-%DATE%.log'),
-            datePattern: 'YYYY-MM-DD',
-            maxSize: '20m',
-            maxFiles: '14d',
-            
-        })
-    ]
+  level: 'info',
+  exitOnError: false,
+  format: ecsFormat({ convertReqRes: true }),
+  transports: [
+    new transports.Console(),
+    // new transports.File({ filename: logDirectory + `/${Date.now()}-app.log` , maxsize: 20 }),
+    new transports.DailyRotateFile({
+      filename: path.join(logDirectory, 'app-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '14d',
+    }),
+  ],
 });
-
 
 export default logger;
