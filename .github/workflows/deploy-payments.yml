@@ -3,7 +3,7 @@ name: deploy-payments
 on:
     push:
         branches:
-            - master
+            - main
         paths:
             - 'payments/**'
 jobs:
@@ -16,4 +16,4 @@ jobs:
               env:
                 DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
                 DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-            - run: docker push rohitbrk12345/payments push
+            - run: docker push rohitbrk12345/payments

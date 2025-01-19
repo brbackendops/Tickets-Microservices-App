@@ -13,7 +13,7 @@ const NATS_URL = process.env.NODE_ENV === "DEV" ? 'nats://127.0.0.1:4222' : proc
 
 
 async function start() {
-    console.log("starting payments service")
+    console.log("starting payments service !")
     await natsWrapper.connect('ticketing',randomBytes(4).toString('hex'),NATS_URL!)
     console.log('connected to NATS')
     
