@@ -7,11 +7,6 @@ on:
         paths:
             - 'payments/**'
 jobs:
-    format:
-        runs-on: ubuntu-latest
-        steps:            
-            - name: Format The Code
-              run: cd payments && npm run format
     build:
         runs-on: ubuntu-latest
         steps:
