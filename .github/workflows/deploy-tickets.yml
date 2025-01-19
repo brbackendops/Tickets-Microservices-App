@@ -7,11 +7,6 @@ on:
         paths:
             - 'tickets/**'
 jobs:
-    format:
-        runs-on: ubuntu-latest
-        steps:            
-            - name: Format The Code
-              run: cd tickets && npm run format
     build:
         runs-on: ubuntu-latest
         steps:
