@@ -39,7 +39,7 @@ jobs:
           trivy image \
             --exit-code 1 \
             --severity HIGH,CRITICAL \
-            --no-process \
+            --no-progress \
             --format template \
             --template '@/usr/local/share/trivy/temp'
             -o trivy-results.sarif \

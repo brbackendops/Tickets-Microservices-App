@@ -39,7 +39,7 @@ jobs:
           trivy image \
             --exit-code 1 \
             --severity HIGH,CRITICAL \
-            --no-process \
+            --no-progress \
             --format sarif \
             --output trivy-results.sarif \
             rohitbrk12345/tickets:${{ github.sha }}
