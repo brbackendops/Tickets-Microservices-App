@@ -40,9 +40,8 @@ jobs:
             --exit-code 1 \
             --severity HIGH,CRITICAL \
             --no-progress \
-            --format template \
-            --template '@/usr/local/share/trivy/temp'
-            -o trivy-results.sarif \
+            --format sarif \
+            --output trivy-results.sarif \
             rohitbrk12345/payments:${{ github.sha }}
         continue-on-error: true
 
