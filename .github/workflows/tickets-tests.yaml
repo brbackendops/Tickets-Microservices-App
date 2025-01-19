@@ -14,10 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
-        - run: |
-            if ! npm run format:check; then
-              npm run format
-            fi
+        - run: cd tickets && npm run format:check
     continue-on-error: true
 
   scan:

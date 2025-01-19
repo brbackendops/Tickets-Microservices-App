@@ -1,136 +1,136 @@
+import { Request, Response, NextFunction } from 'express';
+import TicketRepo from '../db/repo';
+import db from '../db';
 import {
-    Request,
-    Response,
-    NextFunction
-} from "express";
-import TicketRepo from "../db/repo";
-import db from "../db";
-import { TicketCreatedPublisher, TicketUpdatedPublisher } from "../events/publish/publish.types";
-import { natsWrapper } from "../nats-wrapper";
+  TicketCreatedPublisher,
+  TicketUpdatedPublisher,
+} from '../events/publish/publish.types';
+import { natsWrapper } from '../nats-wrapper';
 
-export const createTicketHandler = async (req: Request, res: Response, next: NextFunction): Promise < void > => {
+export const createTicketHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const t = new TicketRepo(db);
 
-    const t = new TicketRepo(db)
+  try {
+    const body = req.body;
+    body.userId = req?.user?.id;
 
-    try {
+    const newTicket = await t.create(body);
+    new TicketCreatedPublisher(natsWrapper.client).publish({
+      id: newTicket.id,
+      title: newTicket.title,
+      price: newTicket.price,
+    });
 
-        const body = req.body
-        body.userId = req?.user?.id
+    res.status(201).json({
+      status: 'success',
+      message: 'ticket successfully created',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        
-        const newTicket = await t.create(body)
-        new TicketCreatedPublisher(natsWrapper.client).publish({
-            id: newTicket.id,
-            title: newTicket.title,
-            price: newTicket.price
-        })
+export const getTicketHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const t = new TicketRepo(db);
 
-        res.status(201).json({
-            status: "success",
-            message: "ticket successfully created"
-        })
+  try {
+    const id = parseInt(req.params.id);
+    const ticket = await t.findOne(id);
 
-    } catch (error) {
-        next(error)
+    res.status(200).json({
+      status: 'success',
+      data: ticket,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTicketsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const t = new TicketRepo(db);
+
+  try {
+    const tickets = await t.findMany();
+
+    res.status(200).json({
+      status: 'success',
+      data: tickets,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateTicketHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const t = new TicketRepo(db);
+  try {
+    const id = parseInt(req.params.id);
+
+    const ticket = await t.findOne(id);
+    if (ticket?.userId !== req.user?.id) {
+      throw new Error('resource not found');
     }
-}
 
-
-export const getTicketHandler = async (req: Request, res: Response, next: NextFunction): Promise < void > => {
-
-    const t = new TicketRepo(db)
-
-    try {
-
-        const id = parseInt(req.params.id)
-        const ticket = await t.findOne(id)
-
-        res.status(200).json({
-            status: "success",
-            data: ticket
-        })
-
-    } catch (error) {
-        next(error)
+    if (ticket?.lock) {
+      res.status(400).json({
+        status: 'error',
+        message: 'ticket is reserved',
+      });
+      return;
     }
-}
 
+    const payload = req.body;
 
-export const getTicketsHandler = async (req: Request, res: Response, next: NextFunction): Promise < void > => {
+    await t.update(id, payload);
 
-    const t = new TicketRepo(db)
+    new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket?.id!,
+      title: payload?.title!,
+      price: payload?.price!,
+    });
 
-    try {
+    res.status(200).json({
+      status: 'success',
+      message: 'ticket updated successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        const tickets = await t.findMany()
+export const deleteTicketHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const t = new TicketRepo(db);
 
-        res.status(200).json({
-            status: "success",
-            data: tickets
-        })
+  try {
+    const id = parseInt(req.params.id);
 
-    } catch (error) {
-        next(error)
-    }
-}
+    await t.delete(id);
 
-
-export const updateTicketHandler = async (req: Request, res: Response, next: NextFunction): Promise < void > => {
-    const t = new TicketRepo(db)
-    try {
-
-        const id = parseInt(req.params.id)
-
-        const ticket = await t.findOne(id)
-        if (ticket?.userId !== req.user?.id) {
-            throw new Error("resource not found")
-        }
-
-        if (ticket?.lock) {
-            res.status(400).json({
-                status: "error",
-                message: "ticket is reserved"
-            });
-            return
-        }
-
-        const payload = req.body
-
-        await t.update(id, payload)
-
-        new TicketUpdatedPublisher(natsWrapper.client).publish({
-            id: ticket?.id!,
-            title: payload?.title!,
-            price: payload?.price!
-        })
-
-        res.status(200).json({
-            status: "success",
-            message: "ticket updated successfully"
-        })
-
-    } catch (error) {
-        next(error)
-    }
-}
-
-
-export const deleteTicketHandler = async (req: Request, res: Response, next: NextFunction): Promise < void > => {
-
-    const t = new TicketRepo(db)
-
-    try {
-
-        const id = parseInt(req.params.id)
-
-        await t.delete(id)
-
-        res.status(200).json({
-            status: "success",
-            message: "ticket deleted successfully"
-        })
-
-    } catch (error) {
-        next(error)
-    }
-}
+    res.status(200).json({
+      status: 'success',
+      message: 'ticket deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};

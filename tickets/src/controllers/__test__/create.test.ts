@@ -1,54 +1,46 @@
-import TicketRepo from "../../db/repo";
+import TicketRepo from '../../db/repo';
 import request from 'supertest';
-import app from "../../app";
-import { signIn } from "./utils";
-
+import app from '../../app';
+import { signIn } from './utils';
 
 describe('ticket create test', () => {
+  let mockCreate: jest.Mock;
 
-    let mockCreate: jest.Mock;
+  beforeAll(() => {
+    jest.clearAllMocks();
 
+    mockCreate = jest.fn();
 
-    beforeAll(() => {
-        jest.clearAllMocks();
+    //@ts-ignore
+    TicketRepo.mockImplementation(() => {
+      return {
+        create: mockCreate,
+      };
+    });
+  });
 
-        mockCreate = jest.fn()
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-        //@ts-ignore
-        TicketRepo.mockImplementation(() => {
-            return {
-                create: mockCreate
-            }
-        })
+  it('should create a ticket with given data', async () => {
+    let ticketData = {
+      title: 'test',
+      price: '1.00',
+    };
 
-    })
+    mockCreate.mockResolvedValue({
+      id: 1,
+      title: 'test',
+      price: '1.00',
+    });
 
-    afterEach(() => {
-        jest.resetAllMocks()
-    })
+    await request(app)
+      .post('/api/tickets/v1')
+      .set('Cookie', signIn())
+      .send(ticketData)
+      .expect(201);
 
-
-    it('should create a ticket with given data', async() => {
-
-        let ticketData = {
-            "title": "test",
-            "price": "1.00"
-        }
-
-
-        mockCreate.mockResolvedValue({
-            id: 1,
-            title: "test",
-            price: "1.00"
-        })
-
-        await request(app)
-            .post('/api/tickets/v1')
-            .set('Cookie',signIn())
-            .send(ticketData)
-            .expect(201);
-
-        expect(mockCreate).toHaveBeenCalled()
-
-    })
-})
+    expect(mockCreate).toHaveBeenCalled();
+  });
+});

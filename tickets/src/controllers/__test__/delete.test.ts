@@ -1,47 +1,39 @@
-import TicketRepo from "../../db/repo";
+import TicketRepo from '../../db/repo';
 import request from 'supertest';
-import app from "../../app";
-import { signIn } from "./utils";
-
+import app from '../../app';
+import { signIn } from './utils';
 
 describe('ticket UPDATE test', () => {
+  let mockDelete: jest.Mock;
 
-    let mockDelete: jest.Mock;
+  beforeAll(() => {
+    jest.clearAllMocks();
 
+    mockDelete = jest.fn();
 
-    beforeAll(() => {
-        jest.clearAllMocks();
+    //@ts-ignore
+    TicketRepo.mockImplementation(() => {
+      return {
+        delete: mockDelete,
+      };
+    });
+  });
 
-        mockDelete = jest.fn()
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-        //@ts-ignore
-        TicketRepo.mockImplementation(() => {
-            return {
-                delete: mockDelete,
-            }
-        })
+  it('should delete a ticket with ticket id', async () => {
+    let ticketData = 1;
 
-    })
+    mockDelete.mockResolvedValue(null);
 
-    afterEach(() => {
-        jest.resetAllMocks()
-    })
+    await request(app)
+      .delete(`/api/tickets/v1/${ticketData}`)
+      .set('Cookie', signIn())
+      .send({})
+      .expect(200);
 
-
-    it('should delete a ticket with ticket id', async() => {
-
-        let ticketData = 1
-
-        mockDelete.mockResolvedValue(null)
-
-        await request(app)
-            .delete(`/api/tickets/v1/${ticketData}`)
-            .set('Cookie',signIn())
-            .send({})
-            .expect(200);
-
-        expect(mockDelete).toHaveBeenCalled()
-
-    })
-   
-})
+    expect(mockDelete).toHaveBeenCalled();
+  });
+});

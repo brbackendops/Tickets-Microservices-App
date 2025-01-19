@@ -1,54 +1,49 @@
-import TicketRepo from "../../db/repo";
+import TicketRepo from '../../db/repo';
 import request from 'supertest';
-import app from "../../app";
-import { signIn } from "./utils";
-
+import app from '../../app';
+import { signIn } from './utils';
 
 // jest.mock("../../db/repo");
 describe('ticket ALL test', () => {
+  let mockFindMany: jest.Mock;
 
-    let mockFindMany: jest.Mock;
+  beforeAll(() => {
+    jest.clearAllMocks();
 
+    mockFindMany = jest.fn();
 
-    beforeAll(() => {
-        jest.clearAllMocks();
+    //@ts-ignore
+    TicketRepo.mockImplementation(() => {
+      return {
+        findMany: mockFindMany,
+      };
+    });
+  });
 
-        mockFindMany = jest.fn()
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-        //@ts-ignore
-        TicketRepo.mockImplementation(() => {
-            return {
-                findMany: mockFindMany
-            }
-        })
+  it('should return all tickets', async () => {
+    mockFindMany.mockImplementation(() => {
+      return [
+        {
+          id: 1,
+          title: 'test',
+          price: '1.00',
+          version: 1,
+          userId: 1,
+          createdAt: new Date(),
+        },
+      ];
+    });
 
-    })
+    const res = await request(app)
+      .get('/api/tickets/v1')
+      .set('Cookie', signIn())
+      .send({});
 
-    afterEach(() => {
-        jest.resetAllMocks()
-    })
-
-    it('should return all tickets', async() => {
-        mockFindMany.mockImplementation(() => {
-            return [
-                {
-                    id: 1,
-                    title: "test",
-                    price: "1.00",
-                    version: 1,
-                    userId: 1,
-                    createdAt: new Date()
-                }
-            ]
-        })
-
-        
-        const res = await request(app)
-        .get('/api/tickets/v1')
-        .set('Cookie',signIn())
-        .send({});
-        
-        expect(mockFindMany).toHaveBeenCalledTimes(1)
-        expect(res.status).toBe(200)
-    })
-})
+    expect(mockFindMany).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(200);
+  });
+});
